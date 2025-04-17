@@ -1,5 +1,6 @@
 package com.example.application.views.ideas;
 
+import com.example.application.data.Genres;
 import com.example.application.data.MovieIdea;
 import com.example.application.services.MovieIdeaService;
 import com.vaadin.collaborationengine.CollaborationAvatarGroup;
@@ -8,6 +9,7 @@ import com.vaadin.collaborationengine.UserInfo;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -17,8 +19,11 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -26,8 +31,13 @@ import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
@@ -41,23 +51,32 @@ public class IdeasView extends Div implements BeforeEnterObserver {
 
     private final Grid<MovieIdea> grid = new Grid<>(MovieIdea.class, false);
 
-    CollaborationAvatarGroup avatarGroup;
+    //CollaborationAvatarGroup avatarGroup;
 
     private TextField userName;
     private TextField movieTitle;
-    private TextField genre;
+    //private TextField genre;
+    private ComboBox<String> genre;
     private DatePicker dateAdded;
+
+    private Filters filters;
 
     private final Button cancel = new Button("Cancel");
     private final Button save = new Button("Save");
 
-    private final CollaborationBinder<MovieIdea> binder;
+    private final BeanValidationBinder<MovieIdea> binder = new BeanValidationBinder<>(MovieIdea.class);
+
 
     private MovieIdea movieIdea;
+
+    
+    //public ArrayList<String> genreItems = new ArrayList<>();
+  
 
     private final MovieIdeaService movieIdeaService;
 
     public IdeasView(MovieIdeaService movieIdeaService) {
+       // this.binder.bindInstanceFields(this);
         this.movieIdeaService = movieIdeaService;
         addClassNames("ideas-view");
 
@@ -67,13 +86,13 @@ public class IdeasView extends Div implements BeforeEnterObserver {
         // identifier, and the user's real name. You can also provide the users
         // avatar by passing an url to the image as a third parameter, or by
         // configuring an `ImageProvider` to `avatarGroup`.
-        UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), "Steve Lange");
+       // UserInfo userInfo = new UserInfo(UUID.randomUUID().toString(), "Steve Lange");
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
 
-        avatarGroup = new CollaborationAvatarGroup(userInfo, null);
-        avatarGroup.getStyle().set("visibility", "hidden");
+        // avatarGroup = new CollaborationAvatarGroup(userInfo, null);
+        // avatarGroup.getStyle().set("visibility", "hidden");
 
         createGridLayout(splitLayout);
         createEditorLayout(splitLayout);
@@ -97,9 +116,6 @@ public class IdeasView extends Div implements BeforeEnterObserver {
                 UI.getCurrent().navigate(IdeasView.class);
             }
         });
-
-        // Configure Form
-        binder = new CollaborationBinder<>(MovieIdea.class, userInfo);
 
         // Bind fields. This is where you'd define e.g. validation rules
 
@@ -159,13 +175,43 @@ public class IdeasView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
+
         userName = new TextField("User Name");
         movieTitle = new TextField("Movie Title");
-        genre = new TextField("Genre");
+
+        genre = new ComboBox<>("Genre");
+        genre.setItems(Genres.GENRES);
+        genre.setClearButtonVisible(true);
+        genre.setPlaceholder("Select genre");
+        genre.setAllowCustomValue(false);
+
         dateAdded = new DatePicker("Date Added");
+
+
+
+
+        binder.forField(userName)
+            .asRequired("Username is required")
+            .bind(MovieIdea::getUserName, MovieIdea::setUserName);
+
+        binder.forField(movieTitle)
+            .asRequired("Movie title is required")
+            .bind(MovieIdea::getMovieTitle, MovieIdea::setMovieTitle);
+
+        binder.forField(genre)
+            .asRequired("Genre is required")
+            .bind(MovieIdea::getGenre, MovieIdea::setGenre);
+
+        binder.forField(dateAdded)
+            .asRequired("Date is required")
+            .bind(MovieIdea::getDateAdded, MovieIdea::setDateAdded);
+
+
+
         formLayout.add(userName, movieTitle, genre, dateAdded);
 
-        editorDiv.add(avatarGroup, formLayout);
+        editorDiv.add(formLayout);
+
         createButtonLayout(editorLayoutDiv);
 
         splitLayout.addToSecondary(editorLayoutDiv);
@@ -180,16 +226,29 @@ public class IdeasView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(buttonLayout);
     }
 
+    // private void createGridLayout(SplitLayout splitLayout) {
+    //     Div wrapper = new Div();
+    //     wrapper.setClassName("grid-wrapper");
+    //     splitLayout.addToPrimary(wrapper);
+    //     wrapper.add(grid);
+    // }
+
     private void createGridLayout(SplitLayout splitLayout) {
+        VerticalLayout verticalLayout = new VerticalLayout();
+        filters = new Filters(this::refreshGrid, this.movieIdeaService);
         Div wrapper = new Div();
+        wrapper.setHeightFull();
         wrapper.setClassName("grid-wrapper");
-        splitLayout.addToPrimary(wrapper);
+        splitLayout.addToPrimary(verticalLayout);
+        verticalLayout.add(filters, wrapper);
         wrapper.add(grid);
     }
 
     private void refreshGrid() {
         grid.select(null);
-        grid.getDataProvider().refreshAll();
+        Specification<MovieIdea> spec = filters;
+        List<MovieIdea> filtered = movieIdeaService.findAll(spec);
+        grid.setItems(filtered);
     }
 
     private void clearForm() {
@@ -198,15 +257,21 @@ public class IdeasView extends Div implements BeforeEnterObserver {
 
     private void populateForm(MovieIdea value) {
         this.movieIdea = value;
-        String topic = null;
-        if (this.movieIdea != null && this.movieIdea.getId() != null) {
-            topic = "movieIdea/" + this.movieIdea.getId();
-            avatarGroup.getStyle().set("visibility", "visible");
-        } else {
-            avatarGroup.getStyle().set("visibility", "hidden");
-        }
-        binder.setTopic(topic, () -> this.movieIdea);
-        avatarGroup.setTopic(topic);
+        binder.readBean(this.movieIdea);
 
     }
+
+    // private void populateForm(MovieIdea value) {
+    //     this.movieIdea = value;
+    //     String topic = null;
+    //     if (this.movieIdea != null && this.movieIdea.getId() != null) {
+    //         topic = "movieIdea/" + this.movieIdea.getId();
+    //         avatarGroup.getStyle().set("visibility", "visible");
+    //     } else {
+    //         avatarGroup.getStyle().set("visibility", "hidden");
+    //     }
+    //     binder.setTopic(topic, () -> this.movieIdea);
+    //     avatarGroup.setTopic(topic);
+
+    // }
 }

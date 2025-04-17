@@ -2,6 +2,8 @@ package com.example.application.services;
 
 import com.example.application.data.MovieIdea;
 import com.example.application.data.MovieIdeaRepository;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,5 +42,9 @@ public class MovieIdeaService {
     public int count() {
         return (int) repository.count();
     }
-
+    
+    public List<MovieIdea> findAll(Specification<MovieIdea> spec) {
+        return repository.findAll(spec);
+    }
+    
 }
