@@ -8,11 +8,14 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Menu;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
+
 import org.vaadin.lineawesome.LineAwesomeIconUrl;
 
 @PageTitle("Welcome to MIB")
 @Route("")
 @Menu(order = 0, icon = LineAwesomeIconUrl.GLOBE_SOLID)
+@AnonymousAllowed
 public class WelcometoMIBView extends HorizontalLayout {
 
     private TextField name;

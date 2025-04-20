@@ -32,6 +32,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 
+import jakarta.annotation.security.RolesAllowed;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +46,7 @@ import org.vaadin.lineawesome.LineAwesomeIconUrl;
 @PageTitle("Ideas")
 @Route("collaborative-master-detail/:movieIdeaID?/:action?(edit)")
 @Menu(order = 1, icon = LineAwesomeIconUrl.COLUMNS_SOLID)
+@RolesAllowed("USER")
 public class IdeasView extends Div implements BeforeEnterObserver {
 
     private final String MOVIEIDEA_ID = "movieIdeaID";

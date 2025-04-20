@@ -12,6 +12,7 @@ public class Genres {
         "Children",
         "Documentary",
         "Drama",
+        "Fantasy",
         "Horror",
         "Romance",
         "Science Fiction",

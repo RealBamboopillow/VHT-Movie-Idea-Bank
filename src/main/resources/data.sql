@@ -20,3 +20,8 @@ insert into movie_idea(version, user_name, movie_title, genre, date_added) value
 insert into movie_idea(version, user_name, movie_title, genre, date_added) values (0, 'andrew_lee555', 'A Stranger in Lapland', 'Mystery', '2025-02-17');
 insert into movie_idea(version, user_name, movie_title, genre, date_added) values (0, 'lucas_davis444', 'The Final Downcount', 'Action', '2025-02-14');
 insert into movie_idea(version, user_name, movie_title, genre, date_added) values (0, 'devilSlayerD50', 'Abomination of the Toxic Wastes', 'Romance', '2024-11-19');
+insert into application_user (version, username, avatarname, hashed_password) values (0,'user','FunnyJollyTimes','$2a$10$xdbKoM48VySZqVSU/cSlVeJn0Z04XCZ7KZBjUBC00eKo5uLswyOpe');
+insert into user_roles (user_id, roles) values (1, 'USER');
+insert into application_user (version, username, avatarname, hashed_password) values (0,'admin','EmmaTheGemma','$2a$10$jpLNVNeA7Ar/ZQ2DKbKCm.MuT2ESe.Qop96jipKMq7RaUgCoQedV.');
+insert into user_roles (user_id, roles) values (2, 'USER');
+insert into user_roles (user_id, roles) values (2, 'ADMIN');
