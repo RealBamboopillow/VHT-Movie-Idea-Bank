@@ -2,6 +2,7 @@ package com.example.application.views;
 
 import com.example.application.data.User;
 import com.example.application.security.AuthenticatedUser;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -10,11 +11,15 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Footer;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H6;
 import com.vaadin.flow.component.html.Header;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.SvgIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
@@ -48,7 +53,16 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.DRAWER);
         addDrawerContent();
         addHeaderContent();
+        //addHeader();
     }
+    // private void addHeader(){
+    //     HorizontalLayout horizontalLayout2 = new HorizontalLayout();
+    //     H1 h1 = new H1();
+    //     h1.setText("Hello everybody and welcome to Movie Idea Bank!");
+    //     addToNavbar(horizontalLayout2);
+    // }
+
+
 
     private void addHeaderContent() {
         DrawerToggle toggle = new DrawerToggle();
@@ -57,7 +71,41 @@ public class MainLayout extends AppLayout {
         viewTitle = new H1();
         viewTitle.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.NONE);
 
-        addToNavbar(true, toggle, viewTitle);
+        // Oikea puoli: käyttäjätiedot tai kirjautumislinkki
+        Component userInfoComponent;
+        Optional<User> maybeUser = authenticatedUser.get();
+
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+
+            MenuBar userMenu = new MenuBar();
+            userMenu.setThemeName("tertiary-inline contrast");
+
+            MenuItem userName = userMenu.addItem("");
+            Div div = new Div();
+            div.add(user.getAvatarName());
+            div.add(new Icon("lumo", "dropdown"));
+            div.addClassNames(
+                LumoUtility.Display.FLEX,
+                LumoUtility.AlignItems.CENTER,
+                LumoUtility.Gap.SMALL
+            );
+            userName.add(div);
+            userName.getSubMenu().addItem("Sign out", e -> authenticatedUser.logout());
+
+            userInfoComponent = userMenu;
+        } else {
+            Anchor loginLink = new Anchor("login", "Sign in");
+            userInfoComponent = loginLink;
+        }
+
+        // Header-layout
+        HorizontalLayout headerLayout = new HorizontalLayout(toggle, viewTitle, userInfoComponent);
+        headerLayout.setWidthFull();
+        headerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        headerLayout.expand(viewTitle); // Puskee käyttäjätiedot oikealle
+
+        addToNavbar(true, headerLayout);
     }
 
     private void addDrawerContent() {
@@ -87,33 +135,35 @@ public class MainLayout extends AppLayout {
 
     private Footer createFooter() {
         Footer layout = new Footer();
+        H6 h6 = new H6();
+        h6.setText("All rights are reserved!");
+        layout.add(h6);
+        // Optional<User> maybeUser = authenticatedUser.get();
+        // if (maybeUser.isPresent()) {
+        //     User user = maybeUser.get();
     
-        Optional<User> maybeUser = authenticatedUser.get();
-        if (maybeUser.isPresent()) {
-            User user = maybeUser.get();
+        //     MenuBar userMenu = new MenuBar();
+        //     userMenu.setThemeName("tertiary-inline contrast");
     
-            MenuBar userMenu = new MenuBar();
-            userMenu.setThemeName("tertiary-inline contrast");
+        //     MenuItem userName = userMenu.addItem("");
+        //     Div div = new Div();
+        //     div.add(user.getAvatarName());
+        //     div.add(new Icon("lumo", "dropdown"));
+        //     div.addClassNames(
+        //         LumoUtility.Display.FLEX,
+        //         LumoUtility.AlignItems.CENTER,
+        //         LumoUtility.Gap.SMALL
+        //     );
+        //     userName.add(div);
+        //     userName.getSubMenu().addItem("Sign out", e -> {
+        //         authenticatedUser.logout();
+        //     });
     
-            MenuItem userName = userMenu.addItem("");
-            Div div = new Div();
-            div.add(user.getAvatarName());
-            div.add(new Icon("lumo", "dropdown"));
-            div.addClassNames(
-                LumoUtility.Display.FLEX,
-                LumoUtility.AlignItems.CENTER,
-                LumoUtility.Gap.SMALL
-            );
-            userName.add(div);
-            userName.getSubMenu().addItem("Sign out", e -> {
-                authenticatedUser.logout();
-            });
-    
-            layout.add(userMenu);
-        } else {
-            Anchor loginLink = new Anchor("login", "Sign in");
-            layout.add(loginLink);
-        }
+        //     layout.add(userMenu);
+        // } else {
+        //     Anchor loginLink = new Anchor("login", "Sign in");
+        //     layout.add(loginLink);
+        // }
     
         return layout;
     }

@@ -1,6 +1,7 @@
 package com.example.application.views.ideas;
 
 import com.example.application.data.Genres;
+import com.example.application.data.MovieDescription;
 import com.example.application.data.MovieIdea;
 import com.example.application.services.MovieIdeaService;
 import com.vaadin.collaborationengine.CollaborationAvatarGroup;
@@ -21,6 +22,7 @@ import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -61,7 +63,7 @@ public class IdeasView extends Div implements BeforeEnterObserver {
     //private TextField genre;
     private ComboBox<String> genre;
     private DatePicker dateAdded;
-
+    private TextArea description;
     private Filters filters;
 
     private final Button cancel = new Button("Cancel");
@@ -135,6 +137,13 @@ public class IdeasView extends Div implements BeforeEnterObserver {
                     this.movieIdea = new MovieIdea();
                 }
                 binder.writeBean(this.movieIdea);
+
+                if (this.movieIdea.getDescription() == null) {
+                        this.movieIdea.setDescription(new MovieDescription());
+                    }
+                this.movieIdea.getDescription().setText(description.getValue());
+
+
                 movieIdeaService.save(this.movieIdea);
                 clearForm();
                 refreshGrid();
@@ -190,7 +199,7 @@ public class IdeasView extends Div implements BeforeEnterObserver {
 
         dateAdded = new DatePicker("Date Added");
 
-
+        description = new TextArea("Plot");
 
 
         binder.forField(userName)
@@ -211,7 +220,37 @@ public class IdeasView extends Div implements BeforeEnterObserver {
 
 
 
-        formLayout.add(userName, movieTitle, genre, dateAdded);
+        binder.forField(description)
+        .withConverter(
+            text -> {
+                MovieDescription desc = new MovieDescription();
+                desc.setText(text);
+                return desc;
+            },
+            desc -> desc != null ? desc.getText() : ""
+        )
+        .bind(MovieIdea::getDescription, MovieIdea::setDescription);
+        
+        
+
+
+        // if (movieIdea != null) {
+        //     binder.readBean(movieIdea);
+        //     description.setValue(getDescriptionText(movieIdea));
+        // } else {
+        //     binder.readBean(new MovieIdea()); // tai jätä lukematta
+        //     description.clear();
+        // }
+
+        if (movieIdea != null) {
+            binder.readBean(movieIdea);
+        } else {
+            binder.readBean(new MovieIdea());
+        }
+        
+            
+
+        formLayout.add(userName, movieTitle, genre, dateAdded, description);
 
         editorDiv.add(formLayout);
 
@@ -235,6 +274,14 @@ public class IdeasView extends Div implements BeforeEnterObserver {
     //     splitLayout.addToPrimary(wrapper);
     //     wrapper.add(grid);
     // }
+
+    private String getDescriptionText(MovieIdea idea) {
+        if (idea != null && idea.getDescription() != null) {
+            return idea.getDescription().getText();
+        }
+        return "";
+    }
+    
 
     private void createGridLayout(SplitLayout splitLayout) {
         VerticalLayout verticalLayout = new VerticalLayout();
