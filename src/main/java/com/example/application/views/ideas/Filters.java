@@ -43,6 +43,10 @@ public class Filters extends Div implements Specification<MovieIdea>{
         });
 
         HorizontalLayout layout = new HorizontalLayout();
+        searchButton.getStyle().setBackground("blue");
+        searchButton.getStyle().setColor("white");
+        clearButton.getStyle().setBackground("red");
+        clearButton.getStyle().setColor("white");
         genre.setItems(Genres.GENRES);
         layout.add(movieTitle, genre, searchButton, clearButton);
         add(layout);
