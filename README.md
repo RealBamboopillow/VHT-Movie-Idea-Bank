@@ -1,7 +1,6 @@
 # Movie Idea Bank
 
-The Goal of this project is to make an meeting place for those who have ideas about movies and for those who don't have ideas but
-have the know-how and resources to make movies but lack ideas. You can submit your idea including Title, Genre and Plot description, and maybe a new movie will be made. You can also see other peoples ideas by logging in.
+The Goal of this project is to make an meeting place for those who have ideas about movies and for those who have the know-how and resources to make movies but lack ideas. You can submit your idea including Title, Genre and Plot description, and maybe a new movie will be made. You can also see other peoples ideas by logging in.
 
 ## Running the application
 
