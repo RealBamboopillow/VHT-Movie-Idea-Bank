@@ -4,9 +4,6 @@ import com.example.application.data.Genres;
 import com.example.application.data.MovieDescription;
 import com.example.application.data.MovieIdea;
 import com.example.application.services.MovieIdeaService;
-import com.vaadin.collaborationengine.CollaborationAvatarGroup;
-import com.vaadin.collaborationengine.CollaborationBinder;
-import com.vaadin.collaborationengine.UserInfo;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -25,7 +22,6 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -36,10 +32,8 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 
 import jakarta.annotation.security.RolesAllowed;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -233,20 +227,20 @@ public class IdeasView extends Div implements BeforeEnterObserver {
         
         
 
+        //TODO test this
+        if (movieIdea != null) {
+            binder.readBean(movieIdea);
+            description.setValue(getDescriptionText(movieIdea));
+        } else {
+            binder.readBean(new MovieIdea()); // or do not read
+            description.clear();
+        }
 
         // if (movieIdea != null) {
         //     binder.readBean(movieIdea);
-        //     description.setValue(getDescriptionText(movieIdea));
         // } else {
-        //     binder.readBean(new MovieIdea()); // tai jätä lukematta
-        //     description.clear();
+        //     binder.readBean(new MovieIdea());
         // }
-
-        if (movieIdea != null) {
-            binder.readBean(movieIdea);
-        } else {
-            binder.readBean(new MovieIdea());
-        }
         
             
 

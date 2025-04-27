@@ -1,7 +1,7 @@
 # Movie Idea Bank
 
-This project can be used as a starting point to create your own Vaadin application with Spring Boot.
-It contains all the necessary configuration and some placeholder files to get you started.
+The Goal of this project is to make an meeting place for those who have ideas about movies and for those who don't have ideas but
+have the know-how and resources to make movies but lack ideas. You can submit your idea including Title, Genre and Plot description, and maybe a new movie will be made. You can also see other peoples ideas by logging in.
 
 ## Running the application
 

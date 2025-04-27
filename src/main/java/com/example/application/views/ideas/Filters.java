@@ -17,7 +17,6 @@ import com.vaadin.flow.component.textfield.TextField;
 
 import jakarta.persistence.criteria.*;
 
-import com.example.application.data.MovieIdea;
 
 public class Filters extends Div implements Specification<MovieIdea>{
 
